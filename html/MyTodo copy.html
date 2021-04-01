@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>My ToDo</title>
+<style>
+body { 
+   background-image: url("핑크.jpg");
+   background-repeat: no-repeat;
+   background-size:cover;
+   margin:50px 100px 100px 100px;
+}
+header {
+   color:white;
+   text-shadow:0px 0px 4px rgb(255,127,39); 
+   font-size:50px;
+   text-align:center;
+   padding:70px;
+    }
+#todo{
+   margin:10px;
+   width:650px;
+   text-align:center;
+}
+#add{
+   background-color:rgb(255,255,255); 
+   box-sizing:content-box;
+}
+#add,#todo{
+   height:30px;
+   border-width: 0px;
+}
+form{
+   margin-left:170px;
+   margin-right:170px;
+   text-align:center;
+}
+</style>
+<script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
+<script>
+let cnt=0; //할일 갯수
+let arr=new Array(); //할일 저장
+let myColor="rgb(255,224,204)";
+function creatediv(count=0, d=0){
+   let maindiv=document.getElementById("main");
+   let newtodo;
+    if(d==0){
+        newtodo=$("#todo").val()
+        //document.createTextNode(newtodo);
+
+        //새로 추가된 할일이니까 arr,localStorage에 저장
+        arr[cnt]=newtodo;
+        cnt++;
+        localStorage.setItem("Arr",JSON.stringify(arr));
+        localStorage.setItem("Cnt",JSON.stringify(cnt));
+    }else{
+        newtodo=d;
+    }
+
+   let newdiv=document.createElement("div");
+   let check=document.createElement("input");
+   let xbtn = document.createElement('button');
+
+   newdiv.setAttribute("id",count+"div"); //parseInt했을때 숫자로 받을수 있게 count를 앞으로
+   newdiv.style.color="rgb(127,127,127)";
+   newdiv.style.background=myColor;
+   newdiv.style.padding="10px";
+   newdiv.style.margin="10px 250px 10px 250px";
+
+   check.setAttribute("type","checkbox");
+   check.setAttribute("name","new");
+   
+   xbtn.className= 'close';
+   xbtn.innerHTML='&times;';
+   xbtn.style.borderWidth="0";
+   xbtn.style.outline="0";
+   xbtn.style.backgroundColor=myColor;
+   xbtn.style.float="right";
+
+   newdiv.append(check);
+   newdiv.append(newtodo);
+   newdiv.append(xbtn);
+
+   maindiv.append(newdiv);
+
+   //x버튼 삭제기능
+   xbtn.onclick = function(e) {
+      let pnode = e.target.parentNode;
+      maindiv.removeChild(pnode);
+      arr[parseInt(pnode.id)] = null;
+      cnt--;
+      localStorage.setItem("Arr",JSON.stringify(arr));
+      localStorage.setItem("Cnt",JSON.stringify(cnt));
+   }
+   
+}
+
+function makeBlank(){
+    let input= document.getElementById("todo");
+    input.value="";
+}
+
+function init(){
+    if(localStorage.getItem("Arr")!==null){
+        cnt=JSON.parse(localStorage.getItem("Cnt"));
+        arr=JSON.parse(localStorage.getItem("Arr"));
+
+        //x버튼으로 null이된 값 없애기
+        let temp = new Array();
+        arr.forEach(function(value, index){
+            if(value==null){
+                temp.push(index);
+            }
+        });
+        temp.reverse().forEach(function(value){
+            arr.splice(value,1);
+        });
+
+        localStorage.setItem("Arr",JSON.stringify(arr));
+
+        for(var i=0;i<cnt;i++){
+            creatediv(i,arr[i]);
+        }
+    }
+}
+
+$(document).ready(function(){
+    init();
+   $("#add").on("click",function(){
+      creatediv(cnt);
+      makeBlank();
+   });
+});
+</script>
+</head>
+<body>
+<header>
+My ToDo
+</header>
+<section>
+<form>
+<input type="text" id="todo"><input type="button" value="+" id="add">
+</form>
+<br>
+<div id="main">
+
+</div>
+</section>
+</body>
+</html>
